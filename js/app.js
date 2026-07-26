@@ -59,47 +59,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    async function handleGenerateMenu(shouldScroll = true) {
+   async function handleGenerateMenu(shouldScroll = true) {
             showLoader(true);
             try {
+                // 1. On vide visuellement la grille pour montrer le rechargement
                 if (plannerGrid) plannerGrid.innerHTML = ''; 
-            
-                if (typeof PlannerService !== 'undefined') {
-                    PlannerService.generateWeeklyMenu = async function() {
-                        const recipes = await ApiService.getRandom(7);
-                        this.weeklyMenu = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'].map((dayName, index) => ({ 
-                            dayIndex: index, 
-                            dayName, 
-                            recipe: recipes[index] || recipes[0] 
-                        }));
-                        return this.weeklyMenu;
-                    };
-                }
-
+                
+                // 2. 🌟 CODE NETTOYÉ : On appelle simplement le service d'origine sans écraser ses fonctions
                 const menu = await PlannerService.generateWeeklyMenu();
                 
-                // 4. RENDU À L'ÉCRAN
+                // 3. Rendu propre à l'écran
                 renderPlanner(menu);
                 showToast("✨ Nouveau planning de 7 repas généré !");
                 
+                // 4. Défilement fluide vers la section du calendrier
                 if (shouldScroll) {
                     const sec = document.getElementById('planner-section');
                     if (sec) sec.scrollIntoView({ behavior: 'smooth' });
                 }
             } catch (e) {
-                console.error("Erreur de génération :", e);
+                console.error("Erreur de génération du menu hebdomadaire :", e);
                 showToast("⚠️ Échec du rafraîchissement.");
             } finally { 
                 showLoader(false); 
             }
         }
 
-          /**
-         * Rendu graphique du planning de la semaine (Haut du site)
-         */
-               /**
-         * Rendu graphique du planning de la semaine (Haut du site)
-         */
+       
         function renderPlanner(menu) {
             // SÉCURITÉ : Si la grille n'existe pas dans le HTML, on coupe
             if (!plannerGrid) return;
@@ -177,38 +163,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    async function loadRecipesCatalog() {
-        showLoader(true);
-        let recipes = [];
-        try {
-            // 1. Récupération des valeurs des filtres
-            const querySearch = searchInput ? searchInput.value.trim() : '';
-            const queryCategory = categoryFilter ? categoryFilter.value : '';
-            const queryCountry = countryFilter ? countryFilter.value : '';
+   async function loadRecipesCatalog() {
+            showLoader(true);
+            let recipes = [];
+            try {
+                // 1. Récupération des valeurs des éléments HTML
+                const querySearch = searchInput ? searchInput.value.trim() : '';
+                const queryCategory = categoryFilter ? categoryFilter.value : '';
+                const queryCountry = countryFilter ? countryFilter.value : '';
 
-            // 2. Logique algorithmique des filtres croisés
-            if (isQuickActive) {
-                recipes = await ApiService.getQuick();
-            } else if (isHealthyActive) {
-                recipes = await ApiService.getHealthy();
-            } else if (querySearch !== '') {
-                recipes = await ApiService.search(querySearch);
-            } else if (queryCategory !== '') {
-                recipes = await ApiService.getByCategory(queryCategory);
-            } else if (queryCountry !== '') {
-                recipes = await ApiService.getByCountry(queryCountry);
-            } else {
-                // 🌟 Si TOUS les filtres sont vides ou réinitialisés, on charge TOUT le catalogue PostgreSQL
-                recipes = await ApiService.getAll();
+                // 2. Logique séquentielle des filtres
+                if (isQuickActive) {
+                    recipes = await ApiService.getQuick();
+                } else if (isHealthyActive) {
+                    recipes = await ApiService.getHealthy();
+                } else if (querySearch !== '') {
+                    recipes = await ApiService.search(querySearch);
+                } else if (queryCategory !== '') {
+                    recipes = await ApiService.getByCategory(queryCategory);
+                } else if (queryCountry !== '') {
+                    // ⚡ On s'assure d'appeler correctement le service pays
+                    recipes = await ApiService.getByCountry(queryCountry);
+                } else {
+                    // Si aucun filtre n'est coché, on affiche l'INTEGRALITÉ du catalogue
+                    recipes = await ApiService.getAll();
+                }
+                
+                // 3. Envoi à la grille pour affichage
+                renderRecipesGrid(recipes);
+            } catch (e) {
+                console.error("Erreur lors du filtrage du catalogue :", e);
+            } finally { 
+                showLoader(false); 
             }
-
-            renderRecipesGrid(recipes);
-        } catch (e) {
-            console.error("Erreur lors du filtrage du catalogue :", e);
-        } finally {
-            showLoader(false);
         }
-    }
 
 
     function renderRecipesGrid(recipes) {
@@ -317,29 +305,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
     // 1. Recherche textuelle (se déclenche 300ms après la fin de la frappe)
-    if (searchInput) {
+  if (searchInput) {
         searchInput.addEventListener('input', () => {
-            if (!checkFilterPermission()) return; 
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(loadRecipesCatalog, 300);
         });
     }
 
     // 2. Filtre par Catégorie
-    if (categoryFilter) {
-        categoryFilter.addEventListener('change', () => {
-            if (!checkFilterPermission()) return; 
-            console.log("Filtre catégorie activé :", categoryFilter.value);
-            loadRecipesCatalog();
+    const targetCategoryFilter = document.getElementById('category-filter');
+    if (targetCategoryFilter) {
+        targetCategoryFilter.addEventListener('change', async () => {
+            console.log("📂 Action : Changement de catégorie détecté ->", targetCategoryFilter.value);
+            await loadRecipesCatalog();
         });
     }
 
     // 3. Filtre par Pays / Origine
-    if (countryFilter) {
-        countryFilter.addEventListener('change', () => {
-            if (!checkFilterPermission()) return; 
-            console.log("Filtre pays activé :", countryFilter.value);
-            loadRecipesCatalog();
+  const targetCountryFilter = document.getElementById('country-filter');
+    if (targetCountryFilter) {
+        
+        targetCountryFilter.removeAttribute('onchange'); 
+        
+        targetCountryFilter.addEventListener('change', async () => {
+            console.log("📍 Action : Changement de pays détecté ->", targetCountryFilter.value);
+            
+            // On force le déclenchement immédiat du chargement PostgreSQL
+            await loadRecipesCatalog(); 
         });
     }
 

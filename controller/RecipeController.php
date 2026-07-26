@@ -71,11 +71,17 @@ class RecipeController {
         $this->jsonResponse($this->formatJsonbColumns($recipes), 200, 'Filtre catégorie');
     }
 
-    private function getRecipesByCountry(string $country): void {
+   private function getRecipesByCountry(string $country): void {
+        
+        $cleanCountry = str_replace('Cuisine ', '', $country);
+        
+        $searchQuery = '%' . substr($cleanCountry, 0, 3) . '%';
+
         $stmt = $this->db->prepare("SELECT * FROM recettes WHERE origine ILIKE :country OR nom ILIKE :country");
-        $stmt->execute([':country' => "%{$country}%"]); // Le % résout le problème des accents ou déclinaisons
+        $stmt->execute([':country' => $searchQuery]); 
         $recipes = $stmt->fetchAll();
-        $this->jsonResponse($this->formatJsonbColumns($recipes), 200, 'Filtre origine');
+        
+        $this->jsonResponse($this->formatJsonbColumns($recipes), 200, 'Filtre origine appliqué avec succès');
     }
 
     private function getQuickRecipes(): void {
