@@ -22,23 +22,30 @@ const PlannerService = (function () {
         return weeklyMenu;
     }
 
-    async function swapRecipeForDay(dayIndex) {
-        if (dayIndex < 0 || dayIndex >= weeklyMenu.length) return;
+        async function swapRecipeForDay(dayIndex) {
+        // Sécurité sur l'index du jour
+        if (dayIndex < 0 || dayIndex >= weeklyMenu.length) return weeklyMenu;
         
-        // Pioche un lot de 5 recettes fraîches au hasard pour le remplacement d'un seul jour
-        const randomBatch = await ApiService.getRandom(5);
-        const cleanBatch = Array.isArray(randomBatch) ? randomBatch : [randomBatch];
-        
-        // Liste des IDs déjà affichés dans la semaine pour éviter les doublons directs
-        const currentIds = weeklyMenu.map(item => item.recipe ? item.recipe.id : 0);
-        
-        // Algorithme : Trouver en priorité un plat qui n'est pas encore affiché cette semaine
-        let newRecipe = cleanBatch.find(r => r && !currentIds.includes(r.id)) || cleanBatch[0];
-        
-        if (newRecipe) {
-            weeklyMenu[dayIndex].recipe = { ...newRecipe }; // Clonage obligatoire
+        try {
+            // On pioche 5 recettes aléatoires de PostgreSQL pour avoir du choix
+            const randomBatch = await ApiService.getRandom(5);
+            const cleanBatch = Array.isArray(randomBatch) ? randomBatch : [randomBatch];
+            
+            // Liste des IDs des plats actuellement affichés pour éviter les doublons
+            const currentIds = weeklyMenu.map(item => item.recipe ? item.recipe.id : 0);
+            
+            // Algorithme : Trouver une recette du lot qui n'est pas déjà dans la semaine
+            let newRecipe = cleanBatch.find(r => r && !currentIds.includes(r.id)) || cleanBatch[0];
+            
+            if (newRecipe) {
+                // On remplace STRICTEMENT la recette de ce jour avec un clonage propre
+                weeklyMenu[dayIndex].recipe = { ...newRecipe };
+            }
+        } catch (e) {
+            console.error("Erreur lors du swap de recette :", e);
         }
-        return weeklyMenu[dayIndex];
+     
+        return weeklyMenu;
     }
 
     function getMenuMetrics() {

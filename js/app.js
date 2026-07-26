@@ -284,50 +284,71 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
 
-
-
-
+    // 1. Recherche textuelle (se déclenche 300ms après la fin de la frappe)
     if (searchInput) {
         searchInput.addEventListener('input', () => {
+            if (!checkFilterPermission()) return; 
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(loadRecipesCatalog, 300);
         });
     }
 
-    // FILTRES INSTANTANÉS : Dès que l'utilisateur change de choix, on recharge !
+    // 2. Filtre par Catégorie
     if (categoryFilter) {
         categoryFilter.addEventListener('change', () => {
-            console.log("Filtre catégorie activé :", categoryFilter.value); // Pour le débogage
+            if (!checkFilterPermission()) return; 
+            console.log("Filtre catégorie activé :", categoryFilter.value);
             loadRecipesCatalog();
         });
     }
 
+    // 3. Filtre par Pays / Origine
     if (countryFilter) {
         countryFilter.addEventListener('change', () => {
-            console.log("Filtre pays activé :", countryFilter.value); // Pour le débogage
+            if (!checkFilterPermission()) return; 
+            console.log("Filtre pays activé :", countryFilter.value);
             loadRecipesCatalog();
         });
     }
 
-      if (closeRecipeBtn) {
+    // 4. Fermeture de la modale détail via le bouton "Croix"
+    if (closeRecipeBtn) {
         closeRecipeBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // Évite tout comportement natif indésirable
+            e.preventDefault();
             recipeModal.classList.add('hidden');
         });
     }
 
-    // Gestion de la fermeture en cliquant n'importe où sur le fond sombre
-    window.addEventListener('click', (e) => {
-        if (e.target === recipeModal) {
-            recipeModal.classList.add('hidden');
-        }
-        if (e.target === shoppingModal) {
-            shoppingModal.classList.add('hidden');
-        }
-    });
+    // 5. BOUTON CHANGER (Nouveau) : Modifie un seul jour sans faire disparaître la grille
+    if (plannerGrid) {
+        plannerGrid.addEventListener('click', async (e) => {
+            // Détecte si le clic s'est fait sur le bouton "Changer" ou son icône
+            const swapBtn = e.target.closest('.swap-day-btn');
+            if (swapBtn) {
+                e.preventDefault();
+                const dayIndex = parseInt(swapBtn.getAttribute('data-day'), 10);
+                
+                showLoader(true);
+                try {
+                    // Appelle le service pour modifier la recette de ce jour spécifique
+                    await PlannerService.swapRecipeForDay(dayIndex);
+                    
+                    // Récupère l'état complet du menu mis à jour
+                    const fullMenu = PlannerService.getCurrentMenu();
+                    
+                    // Redessine instantanément la grille du planning à l'écran
+                    renderPlanner(fullMenu);
+                    showToast("🔄 Plat du jour mis à jour !");
+                } catch (err) {
+                    console.error("Erreur lors du changement de plat :", err);
+                } finally {
+                    showLoader(false);
+                }
+            }
+        });
+    }
 
-
-    // Gestion du clic sur le bouton principal "Générer mon menu"
+    // 6. Gestion du clic sur le bouton principal "Générer mon menu"
     if (generateMenuBtn) {
         generateMenuBtn.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -335,34 +356,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // GESTION DU BOUTON "Nouveau menu" : Force la création d'un tout nouveau planning de 7 jours
+    // 7. Gestion du bouton "Nouveau menu" (Rafraîchissement global)
     if (newMenuBtn) {
         newMenuBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             console.log("🔄 Demande d'un nouveau menu hebdomadaire...");
-            
-            // On vide l'ancienne grille pour montrer visuellement le rafraîchissement
             if (plannerGrid) plannerGrid.innerHTML = ''; 
-            
-            // On appelle l'algorithme qui pioche à nouveau au hasard dans PostgreSQL
             await handleGenerateMenu(true);
         });
     }
 
-
-
-     // Gestion de la fermeture en cliquant n'importe où sur le fond sombre
+    // 8. Gestion de la fermeture des modales au clic sur le fond sombre (Unifié)
     window.addEventListener('click', (e) => {
-        // Sécurité pour la modale recette
-        if (typeof recipeModal !== 'undefined' && recipeModal && e.target === recipeModal) {
+        if (recipeModal && e.target === recipeModal) {
             recipeModal.classList.add('hidden');
         }
-        
-        // 🌟 SÉCURITÉ INJECTÉE : On vérifie si la variable existe avant de tester le clic
         if (typeof shoppingModal !== 'undefined' && shoppingModal && e.target === shoppingModal) {
             shoppingModal.classList.add('hidden');
         }
     });
-
 
 });
