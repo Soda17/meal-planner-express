@@ -1,0 +1,139 @@
+/* ==============================================================================
+   MEAL PLANNER EXPRESS - STYLES SUR-MESURE & ANIMATIONS
+   Design System Portfolio Full-Stack
+   ============================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: #0f172a;
+    color: #f8fafc;
+    overflow-x: hidden;
+}
+
+/* Glassmorphism Containers */
+.glass-panel {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+}
+
+.glass-card {
+    background: rgba(30, 41, 59, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(16, 185, 129, 0.3);
+    box-shadow: 0 12px 30px -10px rgba(16, 185, 129, 0.25);
+}
+
+/* Hero Background Gradients */
+.hero-gradient {
+    background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.25) 0%, rgba(15, 23, 42, 0.95) 70%),
+                linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #10b981;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+    50% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.6); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+.btn-glow {
+    animation: pulseGlow 3s infinite ease-in-out;
+}
+
+/* Checkbox Custom Styling for Shopping List */
+.custom-checkbox {
+    appearance: none;
+    background-color: rgba(51, 65, 85, 0.5);
+    border: 2px solid #475569;
+    border-radius: 6px;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.custom-checkbox:checked {
+    background-color: #10b981;
+    border-color: #10b981;
+}
+
+.custom-checkbox:checked::after {
+    content: '✓';
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.strike-through {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+/* Print Styles for Shopping List */
+@media print {
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+    header, footer, .hero-section, #planner-section, #recipes-grid-section, .no-print {
+        display: none !important;
+    }
+    #shopping-modal {
+        position: static !important;
+        background: none !important;
+    }
+    .glass-panel {
+        background: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        color: #000 !important;
+    }
+}

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Meal Planner Express | Planificateur de repas intelligent</title>
+
+<meta
+    name="description"
+    content="Planifiez facilement vos repas de la semaine, découvrez des recettes variées et générez automatiquement des menus équilibrés avec Meal Planner Express."
+>
+
+<meta
+    name="keywords"
+    content="Meal Planner Express, planificateur de repas, générateur de menus, planning de repas, menu hebdomadaire, recettes, recettes africaines, recettes internationales, alimentation équilibrée, cuisine"
+>
+
+<meta name="author" content="Soda Kondé">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#10b981">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: {
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome 6 Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased">
+
+    <!-- NAVBAR -->
+    <header class="sticky top-0 z-40 w-full glass-panel border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-utensils text-xl text-white"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold tracking-tight text-white block">
+                        Meal Planner 
+                        <span class="text-emerald-400">Express</span>
+                    </span>
+
+                    <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">
+                        Votre assistant repas quotidien
+                    </span>
+                </div>
+            </a>
+
+            
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow">
+
+        <!-- HERO SECTION -->
+        <section class="hero-gradient relative py-20 px-4 sm:px-6 lg:px-8 text-center overflow-hidden border-b border-slate-800">
+            <div class="max-w-4xl mx-auto relative z-10 animate-fade-in">
+                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-semibold text-xs mb-6 uppercase tracking-wider">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Planificateur Intelligent de Repas
+                </span>
+                <h1 class="text-4xl sm:text-6xl font-extrabold text-white tracking-tight mb-6 leading-tight">
+                    Planifiez vos repas de la semaine en <span class="text-gradient">1 clic</span>.
+                </h1>
+                <p class="text-lg sm:text-xl text-slate-300 mb-10 max-w-2xl mx-auto font-normal leading-relaxed">
+                    Planifiez facilement vos repas de la semaine, découvrez des recettes variées et générez automatiquement des menus équilibrés adaptés à votre quotidien.
+                </p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <button id="generate-menu-btn" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-lg rounded-2xl shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-3 transition-all hover:scale-105 btn-glow">
+                        <i class="fa-solid fa-shuffle"></i> Générer mon menu
+                    </button>
+                    <a href="#recipes-grid-section" class="w-full sm:w-auto px-8 py-4 bg-slate-800/80 hover:bg-slate-700 text-slate-200 font-bold text-lg rounded-2xl border border-slate-700 flex items-center justify-center gap-2 transition-all">
+                        <i class="fa-solid fa-compass"></i> Explorer les recettes
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- PLANNING HEBDOMADAIRE SECTION (7 JOURS) -->
+        <section id="planner-section" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4 border-b border-slate-800 pb-6">
+                <div>
+                    <span class="text-emerald-400 font-bold text-xs uppercase tracking-wider block mb-1">Planning Hebdomadaire</span>
+                    <h2 class="text-3xl font-extrabold text-white flex items-center gap-3">
+                        <i class="fa-solid fa-calendar-days text-emerald-400"></i> Votre Menu de la Semaine
+                    </h2>
+                </div>
+                <div class="flex flex-wrap items-center gap-4">
+                    <div class="flex items-center gap-4 text-xs font-semibold bg-slate-900/80 px-4 py-2.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400">Total: <strong id="menu-total-cal" class="text-amber-400 font-bold">0 kcal</strong></span>
+                        <span class="text-slate-600">|</span>
+                        <span class="text-slate-400">Statut: <strong class="text-emerald-400 font-bold">Menu 7 Jours Prêt</strong></span>
+                    </div>
+                    <button id="new-menu-btn" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 flex items-center gap-2 transition-all">
+                        <i class="fa-solid fa-arrows-rotate"></i> Nouveau menu
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grille des 7 Repas -->
+            <div id="planner-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
+                <!-- Généré dynamiquement par JS -->
+            </div>
+        </section>
+
+        <!-- CATALOGUE & FILTRES DES RECETTES SECTION -->
+        <section id="recipes-grid-section" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-800">
+            <div class="mb-10 text-center">
+                <h2 class="text-3xl font-extrabold text-white mb-3">Toutes les Recettes</h2>
+                <p class="text-slate-400 text-sm max-w-xl mx-auto">Filtrez par catégorie, origine ou préférences nutritionnelles pour trouver l'inspiration.</p>
+            </div>
+
+            <!-- BARRE DE RECHERCHE ET FILTRES -->
+            <div class="glass-panel p-6 rounded-3xl mb-10 border border-slate-800 shadow-2xl">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                    
+                    <!-- Barre de Recherche -->
+                    <div class="md:col-span-4 relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" id="search-input" placeholder="Rechercher une recette ou ingrédient..." 
+                            class="w-full pl-11 pr-4 py-3 bg-slate-900/90 border border-slate-700/80 rounded-2xl text-slate-200 text-sm placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors">
+                    </div>
+
+                    <!-- Filtre Catégories -->
+                    <div class="md:col-span-3">
+                        <select id="category-filter" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700/80 rounded-2xl text-slate-200 text-sm focus:outline-none focus:border-emerald-500 transition-colors">
+                            <option value="">Toutes les Catégories</option>
+                            <option value="Viande">🥩 Viande</option>
+                            <option value="Poisson">🐟 Poisson</option>
+                            <option value="Végétarien">🥗 Végétarien</option>
+                            <option value="Vegan">🌱 Vegan</option>
+                            <option value="Petit-déjeuner">🥞 Petit-déjeuner</option>
+                            <option value="Dessert">🍰 Dessert</option>
+                            <option value="Salade">🥬 Salade</option>
+                            <option value="Soupe">🥣 Soupe</option>
+                            <option value="Pizza">🍕 Pizza</option>
+                            <option value="Pâtes">🍝 Pâtes</option>
+                            <option value="Riz">🍚 Riz</option>
+                            <option value="Cuisine française">🥖 Cuisine française</option>
+                            <option value="Cuisine italienne">🇮🇹 Cuisine italienne</option>
+                            <option value="Cuisine africaine">🌍 Cuisine africaine</option>
+                            <option value="Cuisine marocaine">🇲🇦 Cuisine marocaine</option>
+                            <option value="Cuisine asiatique">🥢 Cuisine asiatique</option>
+                            <option value="Cuisine mexicaine">🌮 Cuisine mexicaine</option>
+                        </select>
+                    </div>
+
+                    <!-- Filtre Origine -->
+                    <div class="md:col-span-3">
+                        <select id="country-filter" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700/80 rounded-2xl text-slate-200 text-sm focus:outline-none focus:border-emerald-500 transition-colors">
+                            <option value="">Toutes les Origines</option>
+                            <option value="France">France</option>
+                            <option value="Cuisine italienne">Italie</option>
+                            <option value="Cuisine marocaine">Maroc</option>
+                            <option value="Sénégal">Sénégal</option>
+                            <option value="Cuisine asiatique">Asie</option>
+                            <option value="Cuisine mexicaine">Mexique</option>
+                            <option value="Espagne">Espagne</option>
+                            <option value="Inde">Inde</option>
+                        </select>
+                    </div>
+
+                    <!-- Actions / Badges Express & Healthy -->
+                    <div class="md:col-span-2 flex items-center justify-end gap-2">
+                        <button id="quick-filter-btn" class="px-4 py-2 bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-semibold rounded-xl transition-all" title="Moins de 20 minutes">
+                            ⚡ Express
+                        </button>
+                        <button id="healthy-filter-btn" class="px-4 py-2 bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-semibold rounded-xl transition-all" title="Moins de 500 kcal">
+                            💚 Healthy
+                        </button>
+                        <button id="reset-filters-btn" class="p-2 text-slate-400 hover:text-rose-400 text-sm transition-colors" title="Réinitialiser les filtres">
+                            <i class="fa-solid fa-arrow-rotate-left"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- LOADER -->
+            <div id="recipes-loading" class="hidden text-center py-16">
+                <div class="inline-block w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p class="text-slate-400 text-sm font-medium">Chargement des meilleures recettes...</p>
+            </div>
+
+            <!-- MESSAGE AUCUNE RECETTE -->
+            <div id="no-results" class="hidden text-center py-16 glass-panel rounded-3xl border border-slate-800 max-w-lg mx-auto">
+                <i class="fa-solid fa-magnifying-glass-chart text-5xl text-slate-600 mb-4"></i>
+                <h3 class="text-xl font-bold text-white mb-2">Aucune recette trouvée</h3>
+                <p class="text-slate-400 text-sm mb-6">Essayez de modifier vos critères de recherche ou vos filtres.</p>
+            </div>
+
+            <!-- GRILLE DES CARTES DE RECETTES -->
+            <div id="recipes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Généré dynamiquement par JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODALE DÉTAILS D'UNE RECETTE -->
+    <div id="recipe-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-panel w-full max-w-3xl rounded-3xl border border-slate-700 shadow-2xl overflow-hidden animate-fade-in my-8 max-h-[90vh] flex flex-col">
+            <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Fiche Recette Détaillée</span>
+                <button id="close-recipe-btn" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="recipe-modal-content" class="p-6 overflow-y-auto flex-grow space-y-6">
+                <!-- Injecté par JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE LISTE DE COURSES CONSOLIDÉE -->
+    <div id="shopping-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-panel w-full max-w-2xl rounded-3xl border border-slate-700 shadow-2xl overflow-hidden animate-fade-in my-8 max-h-[90vh] flex flex-col">
+            
+            <!-- Header Modal -->
+            <div class="p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                        <i class="fa-solid fa-basket-shopping text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Liste des Courses Consolidée</h3>
+                        <p id="shopping-progress-text" class="text-xs text-slate-400 font-medium">Calcul des ingrédients...</p>
+                    </div>
+                </div>
+                <button id="close-shopping-btn" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-800 h-2">
+                <div id="shopping-progress-bar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-2 transition-all duration-300" style="width: 0%"></div>
+            </div>
+
+            <!-- Ingrédients List Container -->
+            <div class="p-6 overflow-y-auto flex-grow">
+                <ul id="shopping-list-container" class="space-y-2.5">
+                    <!-- Injecté par JS -->
+                </ul>
+            </div>
+
+            <!-- Footer Actions Modal -->
+            <div class="p-5 border-t border-slate-800 bg-slate-900/80 flex flex-wrap items-center justify-between gap-3 no-print">
+                <button id="reset-shopping-btn" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl border border-slate-700 transition-colors">
+                    <i class="fa-solid fa-rotate-left"></i> Decoher tout
+                </button>
+                <div class="flex items-center gap-2">
+                    <button id="print-shopping-btn" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 flex items-center gap-2 transition-colors">
+                        <i class="fa-solid fa-print"></i> Imprimer
+                    </button>
+                    <button id="copy-shopping-btn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition-all">
+                        <i class="fa-regular fa-copy"></i> Copier la liste
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="mt-20 border-t border-slate-800 bg-slate-950 py-10 px-4 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>© 2026 Meal Planner Express. Tous droits réservés. Conçu et développé par Soda Kondé.</p>
+                        <div class="flex items-center gap-4 text-slate-400">
+                <span>
+                    <i class="fa-solid fa-utensils text-emerald-400"></i>
+                    120+ recettes
+                </span>
+
+                <span>•</span>
+
+                <span>
+                    <i class="fa-solid fa-calendar-days text-indigo-400"></i>
+                    Planning hebdomadaire intelligent
+                </span>
+            </div>
+                    </div>
+    </footer>
+
+
+    <!-- Script JavaScript Consolidé -->
+  
+      <script src="js/service/api.js"></script>
+    <script src="js/service/planner.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
