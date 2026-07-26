@@ -1,11 +1,18 @@
-/**
- * Contrôleur Frontend principal - Gestion des clics et de l'affichage DOM
- */
 document.addEventListener('DOMContentLoaded', async () => {
     
-    // Captures des éléments DOM
+    // 1. Captures des éléments DOM
     const generateMenuBtn = document.getElementById('generate-menu-btn');
     const newMenuBtn = document.getElementById('new-menu-btn');
+    const openShoppingBtn = document.getElementById('open-shopping-btn');
+    
+    // Sécurité pour la modale shopping retirée du HTML
+    const shoppingModal = null; 
+    
+    const shoppingProgressBar = document.getElementById('shopping-progress-bar');
+    const shoppingProgressText = document.getElementById('shopping-progress-text');
+    const printShoppingBtn = document.getElementById('print-shopping-btn');
+    const copyShoppingBtn = document.getElementById('copy-shopping-btn');
+    const resetShoppingBtn = document.getElementById('reset-shopping-btn');
     const recipeModal = document.getElementById('recipe-modal');
     const closeRecipeBtn = document.getElementById('close-recipe-btn');
     const recipeModalContent = document.getElementById('recipe-modal-content');
@@ -20,23 +27,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     const noResultsMsg = document.getElementById('no-results');
     const recipesLoading = document.getElementById('recipes-loading');
 
+    // 2. Déclaration unique des variables d'état locales
     let isQuickActive = false, isHealthyActive = false, searchTimeout = null;
 
-
-    function showLoader(s) {
-        const recipesLoading = document.getElementById('recipes-loading');
-        if (recipesLoading) recipesLoading.classList.toggle('hidden', !s);
+    // 3. Fonctions utilitaires globales du contrôleur
+    function showLoader(s) { 
+        const loadingElem = document.getElementById('recipes-loading');
+        if (loadingElem) loadingElem.classList.toggle('hidden', !s); 
+    }
+    
+    function showToast(m) { 
+        const t = document.createElement('div'); 
+        t.className = 'fixed bottom-6 right-6 z-50 px-5 py-3 rounded-xl font-semibold text-sm text-white bg-emerald-600 shadow-2xl animate-fade-in'; 
+        t.textContent = m; 
+        document.body.appendChild(t); 
+        setTimeout(() => t.remove(), 3000); 
     }
 
-    function showToast(m) {
-        const t = document.createElement('div');
-        t.className = 'fixed bottom-6 right-6 z-50 px-5 py-3 rounded-xl font-semibold text-sm text-white bg-emerald-600 shadow-2xl animate-fade-in';
-        t.textContent = m;
-        document.body.appendChild(t);
-        setTimeout(() => t.remove(), 3000);
-    }
-
-    // 3. Lancement direct et sécurisé de l'application
+    // 4. Lancement asynchrone sécurisé du cycle de vie de l'application
     await initApp();
 
     async function initApp() {
@@ -45,9 +53,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             await handleGenerateMenu(false);
             await loadRecipesCatalog();
         } catch (e) {
-            console.error(e);
-        } finally { showLoader(false); }
+            console.error("Erreur lors de l'initialisation de l'application :", e);
+        } finally { 
+            showLoader(false); 
+        }
     }
+
     async function handleGenerateMenu(shouldScroll = true) {
             showLoader(true);
             try {
@@ -337,6 +348,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             await handleGenerateMenu(true);
         });
     }
+
+
+
+     // Gestion de la fermeture en cliquant n'importe où sur le fond sombre
+    window.addEventListener('click', (e) => {
+        // Sécurité pour la modale recette
+        if (typeof recipeModal !== 'undefined' && recipeModal && e.target === recipeModal) {
+            recipeModal.classList.add('hidden');
+        }
+        
+        // 🌟 SÉCURITÉ INJECTÉE : On vérifie si la variable existe avant de tester le clic
+        if (typeof shoppingModal !== 'undefined' && shoppingModal && e.target === shoppingModal) {
+            shoppingModal.classList.add('hidden');
+        }
+    });
 
 
 });

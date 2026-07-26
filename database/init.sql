@@ -98,7 +98,7 @@ INSERT INTO recettes (
     ]'::jsonb,
     '1. Réussir le rissolé ("rossi") : Couper l''oignon et la moitié du poivron en dés et un piment en 2. Écraser les tomates cerises, ajouter le concentré de tomate et diluer avec 3 c.à.s d''eau. Chauffer 20 cl d''huile dans une marmite, ajouter l''oignon, le poivron, le piment coupé, le yett et le mélange de tomate. Saler. Laisser rissoler jusqu''à obtenir une couleur rouge foncé sans brûler. Ajouter 1,5L d''eau quand l''huile remonte, puis ajouter les légumes (carottes, aubergine, chou, manioc, gombos, piment).
 2. Préparer le Roof (la farce) : Piler le persil avec 2 ou 3 piments, 3 gousses d''ail et du sel. Faire un trou dans la chair du poisson propre et farcir de roof. Ajouter les poissons un à un dans le bouillon de la marmite (sans les frire).
-3. Préparer le nokoss (l''assaisonnement) : Hacher 1 oignon, 1 poivron, 1 petit piment sec et du sel. Incorporer une partie du nokoss à la préparation, ajouter le guedj lavé, couvrir partiellement et laisser mijoter doucement 1 heure.
+3. Préparer le nokoss (l''assaisonnement) : Hacher 1 oignon, 1 poivron, 1 petit piment sec et du sel. Incorporer une partie du nokoss à la préparation, couvrir partiellement et laisser mijoter doucement 1 heure.
 4. Préparer le riz : Laver le riz 3 fois. Enlever les légumes et les poissons de la marmite et les réserver. Précuire le riz à la vapeur 15 minutes. Ajouter le reste du nokoss dans la marmite, rectifier le sel. Diminuer le bouillon par précaution puis incorporer le riz (le liquide doit juste recouvrir le riz). Couvrir, réduire le feu et laisser cuire en retournant le riz après 15 minutes, puis toutes les 10 minutes jusqu''à cuisson complète.'
 ),
 
