@@ -344,9 +344,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 5. BOUTON CHANGER (Nouveau) : Modifie un seul jour sans faire disparaître la grille
+        // ==========================================================================
+    // ⚡ GESTION CENTRALISÉE DES CLICS SUR LE PLANNING DU HAUT (js/app.js)
+    // ==========================================================================
     if (plannerGrid) {
         plannerGrid.addEventListener('click', async (e) => {
-            // Détecte si le clic s'est fait sur le bouton "Changer" ou son icône
+            
+            // 🔍 CAS A : L'utilisateur a cliqué sur le bouton "Changer"
             const swapBtn = e.target.closest('.swap-day-btn');
             if (swapBtn) {
                 e.preventDefault();
@@ -354,13 +358,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 showLoader(true);
                 try {
-                    // Appelle le service pour modifier la recette de ce jour spécifique
                     await PlannerService.swapRecipeForDay(dayIndex);
-                    
-                    // Récupère l'état complet du menu mis à jour
                     const fullMenu = PlannerService.getCurrentMenu();
-                    
-                    // Redessine instantanément la grille du planning à l'écran
                     renderPlanner(fullMenu);
                     showToast("🔄 Plat du jour mis à jour !");
                 } catch (err) {
@@ -368,6 +367,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } finally {
                     showLoader(false);
                 }
+                return; // On arrête l'exécution ici si c'était un bouton changer
+            }
+
+            // 🔍 CAS B : L'utilisateur a cliqué sur le TITRE du plat pour voir la recette
+            const recipeBtn = e.target.closest('.view-recipe-btn');
+            if (recipeBtn) {
+                e.preventDefault();
+                const recipeId = recipeBtn.getAttribute('data-id');
+                console.log("🔍 Ouverture de la modale depuis le planning pour l'ID :", recipeId);
+                
+                // Appel de votre fonction existante qui ouvre et remplit la modale
+                await openRecipeDetailModal(recipeId);
             }
         });
     }
