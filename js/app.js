@@ -94,42 +94,74 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-    function renderPlanner(menu) {
-        if (!plannerGrid) return;
-        plannerGrid.innerHTML = '';
-        menu.forEach(item => {
-            const recipe = item.recipe;
-            if (!recipe) return;
-            const card = document.createElement('div');
-            card.className = 'glass-card rounded-2xl overflow-hidden p-4 flex flex-col justify-between border border-slate-700/50 hover:border-emerald-500/40 transition-all';
-            card.innerHTML = `
-                <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 font-bold text-xs rounded-full uppercase tracking-wider">${item.dayName}</span>
-                        <button class="swap-day-btn text-xs text-slate-400 hover:text-emerald-400 flex items-center gap-1 transition-colors" data-day="${item.dayIndex}"><i class="fa-solid fa-rotate"></i> Changer</button>
+          /**
+         * Rendu graphique du planning de la semaine (Haut du site)
+         */
+               /**
+         * Rendu graphique du planning de la semaine (Haut du site)
+         */
+        function renderPlanner(menu) {
+            // SÉCURITÉ : Si la grille n'existe pas dans le HTML, on coupe
+            if (!plannerGrid) return;
+
+            // On vide TOUJOURS l'ancien affichage pour forcer le rafraîchissement
+            plannerGrid.innerHTML = '';
+
+            if (!menu || menu.length === 0) {
+                plannerGrid.innerHTML = `
+                    <div class="col-span-full text-center p-8 bg-slate-900/50 rounded-2xl border border-slate-800 text-slate-400">
+                        <i class="fa-solid fa-cookie-bite text-3xl text-emerald-500 mb-2"></i>
+                        <p class="text-sm">Aucun menu généré. Cliquez sur le bouton pour commencer.</p>
                     </div>
-                    <div class="relative h-44 w-full overflow-hidden rounded-xl mb-3 bg-slate-900">
-                        <img src="${recipe.image}" alt="${recipe.nom}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
-                        <span class="absolute bottom-2 left-2 bg-slate-900/80 text-xs px-2 py-1 rounded text-white font-medium">
-                            <i class="fa-regular fa-clock text-emerald-400"></i> ${recipe.temps_preparation} min
-                        </span>
+                `;
+                return;
+            }
+
+            // Boucle de génération des 7 cartes de la semaine
+            menu.forEach(item => {
+                const recipe = item.recipe;
+                if (!recipe) return;
+
+                const card = document.createElement('div');
+                card.className = 'group bg-slate-900/60 rounded-2xl border border-slate-800/80 p-4 flex flex-col justify-between hover:border-emerald-500/30 transition-all duration-300 backdrop-blur-sm shadow-xl';
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 font-extrabold text-[10px] rounded-md uppercase tracking-wider">${item.dayName}</span>
+                            <button class="swap-day-btn text-[11px] font-semibold text-slate-400 hover:text-emerald-400 flex items-center gap-1 transition-colors" data-day="${item.dayIndex}">
+                                <i class="fa-solid fa-rotate"></i> Changer
+                            </button>
+                        </div>
+                        <div class="relative h-32 w-full rounded-xl overflow-hidden mb-3 bg-slate-950">
+                            <img src="${recipe.image}" alt="${recipe.nom}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
+                            <span class="absolute bottom-2 left-2 bg-slate-900/80 text-[10px] px-2 py-0.5 rounded text-white font-medium">
+                                <i class="fa-regular fa-clock text-emerald-400"></i> ${recipe.temps_preparation} min
+                            </span>
+                        </div>
+                        <h4 class="font-bold text-white text-sm line-clamp-2 mb-2 cursor-pointer view-recipe-btn hover:text-emerald-400 transition-colors" data-id="${recipe.id}">
+                            ${recipe.nom}
+                        </h4>
                     </div>
-                    <h4 class="font-bold text-white text-sm line-clamp-2 mb-2 cursor-pointer view-recipe-btn" data-id="${recipe.id}">${recipe.nom}</h4>
-                </div>
-                <div class="flex items-center justify-between text-xs text-slate-400 border-t border-slate-700/50 pt-2 mt-2">
-                    <span><i class="fa-solid fa-fire text-amber-400"></i> ${recipe.calories} kcal</span>
-                            <span class="font-semibold text-emerald-400">📊 ${recipe.difficulte}</span>
+                    <div class="flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-800/60 pt-2.5 mt-2">
+                        <span><i class="fa-solid fa-fire text-amber-500"></i> ${recipe.calories} kcal</span>
+                        <span class="font-bold text-emerald-400">📊 ${recipe.difficulte}</span>
+                    </div>
+                `;
 
-                </div>
-            `;
-            plannerGrid.appendChild(card);
-        });
+                plannerGrid.appendChild(card);
+            });
 
-        const metrics = PlannerService.getMenuMetrics();
-        if (document.getElementById('menu-total-cal')) document.getElementById('menu-total-cal').textContent = `${metrics.totalCalories} kcal`;
+            // 🌟 COMPTAGE DES CALORIES SÉCURISÉ (Remplace updatePlannerMetrics)
+            if (typeof PlannerService !== 'undefined' && PlannerService.getMenuMetrics) {
+                const metrics = PlannerService.getMenuMetrics();
+                const totalCalElem = document.getElementById('menu-total-cal');
+                if (totalCalElem) {
+                    totalCalElem.textContent = `${metrics.totalCalories} kcal`;
+                }
+            }
+        }
 
-        addPlannerListeners();
-    }
 
     function addPlannerListeners() {
         document.querySelectorAll('.swap-day-btn').forEach(btn => {
